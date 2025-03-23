@@ -1,4 +1,4 @@
-## DASH
+## Dispersion Analysis and Simulations for Handling (DASH) of Future Fuels initiative
 
 # Project Description
 The DASH project focused on developing an advanced multi-fidelity planning tool designed to predict the dispersion behaviour of ammonia and methanol during accidental leakages in bunkering operations. More details can be found at chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.maritimeinstitute.sg/wp-content/uploads/2024/09/IHPC_Disperson-Analysis-and-Simulations-for-Handling-of-Future-Fuels.pdf

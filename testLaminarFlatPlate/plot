@@ -23,6 +23,7 @@ gnuplot<<EOF
     weighardt(x) = 0.288*(log10(x))**(-2.45) # turbulent
     plot \
         weighardt(x) t "Weighardt"  w lines lc "red" lw 2, \
-        "tauw_${model}_${yp}.dat" u (\$1 - X0)*UInf/nuInf:(sqrt(\$2*\$2 + \$3*\$3 + \$4*\$4)/(0.5*UInf*UInf)) title "$model y^+ ${yp}" w lines lc "black" lw 2
+        "tauw_${model}_${yp}.dat" u (\$1 - X0)*UInf/nuInf:(sqrt(\$2*\$2 + \$3*\$3 + \$4*\$4)/(0.5*UInf*UInf)) \
+	title "$model y^+ ${yp}" w lines lc "black" lw 2
 
 EOF

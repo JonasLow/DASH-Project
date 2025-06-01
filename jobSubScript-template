@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -q normal
+#PBS -N test_wind
+#PBS -l select=1:ncpus=128:mpiprocs=128:mem=256G
+#PBS -m abe
+#PBS -M <YOUR EMAIL>
+#PBS -l walltime=24:00:00
+#PBS -P 13003612 ##this is Ronald's project number
+
+cd "$PBS_O_WORKDIR"
+
+###source /home/project/13003612/OpenFOAM/foam-extend-4.1/etc/bashrc
+
+module load openfoam/2412
+
+./Allrun.sh > log.run 2>&1

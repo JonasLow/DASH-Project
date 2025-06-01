@@ -1,0 +1,14 @@
+# OpenFOAM archives and folders
+OpenFOAM-v2012-windows10.tgz
+OpenFOAM/
+
+# Ignore all time directories (e.g. 0.01, 0.02, 0.03, …)
+[0-9]*
+
+# If you ran in parallel, ignore processorX folders:
+processor*/
+log.*
+postProcessing/
+
+# Editor cruft
+*.ini

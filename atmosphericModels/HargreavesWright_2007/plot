@@ -1,5 +1,16 @@
-#!/bin/sh
+#!/bin/bash
 cd "${0%/*}" || exit                                # Run from this directory
+
+if [[ -n "$LD_LIBRARY_PATH" ]]; then
+    LD_LIBRARY_PATH=$(echo "$LD_LIBRARY_PATH" | tr ':' '\n' \
+      | grep -v '/opt/OpenFOAM/OpenFOAM-v2012/ThirdParty/platforms/linux64/gcc-6.3.0/lib64' \
+      | paste -sd':' -)
+    export LD_LIBRARY_PATH
+fi
+
+gnuplot --version >/dev/null 2>&1 \
+  || { echo "ERROR: gnuplot not found or cannot load Qt5 – please install gnuplot."; exit 1; }
+
 . ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
 #------------------------------------------------------------------------------
 
@@ -41,9 +52,9 @@ plotUxUpstream() {
         "system/atm-HargreavesWright-2007/Ux-HW-RH-Fig6a" \
             u 1:2 t "RH" w p ps 2 pt 6 lc rgb "#000000", \
         "system/atm-HargreavesWright-2007/Ux-HW-RH-Fig6a" \
-            u 1:2 t "HW, x=2500m" w p ps 1 pt 5 lc rgb "#E69F00", \
+            u 1:2 t "HW, x=400m" w p ps 1 pt 5 lc rgb "#E69F00", \
         "system/atm-HargreavesWright-2007/Ux-HW-RH-Fig6a" \
-            u 1:2 t "HW, x=4000m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
+            u 1:2 t "HW, x=800m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
         inp0 u 2:((\$1-$zMin)/zRef) t "OF, x=0m (Patch)" w l lw 2 lc rgb "#009E73", \
         inp1 u 2:((\$1-$zMin)/zRef) t "OF, x=0m (Cell)" w l lw 2 lc rgb "#F0E440"
 PLT_UX_UPSTREAM
@@ -68,18 +79,18 @@ plotUxMid() {
     set output "$outName"
 
     zRef = 6
-    inp2="$timeDir/x_2500m_U.xy"
-    inp3="$timeDir/x_4000m_U.xy"
+    inp2="$timeDir/x_400m_U.xy"
+    inp3="$timeDir/x_800m_U.xy"
 
     plot \
         "system/atm-HargreavesWright-2007/Ux-HW-RH-Fig6a" \
             u 1:2 t "RH" w p ps 2 pt 6 lc rgb "#000000", \
         "system/atm-HargreavesWright-2007/Ux-HW-RH-Fig6a" \
-            u 1:2 t "HW, x=2500m" w p ps 1 pt 5 lc rgb "#E69F00", \
+            u 1:2 t "HW, x=400m" w p ps 1 pt 5 lc rgb "#E69F00", \
         "system/atm-HargreavesWright-2007/Ux-HW-RH-Fig6a" \
-            u 1:2 t "HW, x=4000m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
-        inp2 u 2:((\$1-$zMin)/zRef) t "OF, x=2500m" w l lw 2 lc rgb "#0072B2", \
-        inp3 u 2:((\$1-$zMin)/zRef) t "OF, x=4000m" w l lw 2 lc rgb "#D55E00"
+            u 1:2 t "HW, x=800m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
+        inp2 u 2:((\$1-$zMin)/zRef) t "OF, x=400m" w l lw 2 lc rgb "#0072B2", \
+        inp3 u 2:((\$1-$zMin)/zRef) t "OF, x=800m" w l lw 2 lc rgb "#D55E00"
 PLT_UX_MID
 }
 
@@ -102,18 +113,18 @@ plotUxDownstream() {
     set output "$outName"
 
     zRef = 6
-    inp4="$timeDir/x_5000mCell_U.xy"
-    inp5="$timeDir/x_5000mPatch_U.xy"
+    inp4="$timeDir/x_1000mCell_U.xy"
+    inp5="$timeDir/x_1000mPatch_U.xy"
 
     plot \
         "system/atm-HargreavesWright-2007/Ux-HW-RH-Fig6a" \
             u 1:2 t "RH" w p ps 2 pt 6 lc rgb "#000000", \
         "system/atm-HargreavesWright-2007/Ux-HW-RH-Fig6a" \
-            u 1:2 t "HW, x=2500m" w p ps 1 pt 5 lc rgb "#E69F00", \
+            u 1:2 t "HW, x=400m" w p ps 1 pt 5 lc rgb "#E69F00", \
         "system/atm-HargreavesWright-2007/Ux-HW-RH-Fig6a" \
-            u 1:2 t "HW, x=4000m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
-        inp4 u 2:((\$1-$zMin)/zRef) t "OF, x=5000m (Cell)" w l lw 2 lc rgb "#CC79A7", \
-        inp5 u 2:((\$1-$zMin)/zRef) t "OF, x=5000m (Patch)" w l lw 2 lc rgb "#440154"
+            u 1:2 t "HW, x=800m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
+        inp4 u 2:((\$1-$zMin)/zRef) t "OF, x=1000m (Cell)" w l lw 2 lc rgb "#CC79A7", \
+        inp5 u 2:((\$1-$zMin)/zRef) t "OF, x=1000m (Patch)" w l lw 2 lc rgb "#440154"
 PLT_UX_DOWNSTREAM
 }
 
@@ -140,24 +151,24 @@ plotK() {
     zRef = 6
     inp0="$timeDir/x_0mCell_$items.xy"
     inp1="$timeDir/x_0mPatch_$items.xy"
-    inp2="$timeDir/x_2500m_$items.xy"
-    inp3="$timeDir/x_4000m_$items.xy"
-    inp4="$timeDir/x_5000mCell_$items.xy"
-    inp5="$timeDir/x_5000mPatch_$items.xy"
+    inp2="$timeDir/x_400m_$items.xy"
+    inp3="$timeDir/x_800m_$items.xy"
+    inp4="$timeDir/x_1000mCell_$items.xy"
+    inp5="$timeDir/x_1000mPatch_$items.xy"
 
     plot \
         "system/atm-HargreavesWright-2007/k-RH-Fig6b" \
             u 1:2 t "RH" w p ps 2 pt 6 lc rgb "#000000", \
-        "system/atm-HargreavesWright-2007/k-HW-Fig6b-2500" \
-            u 1:2 t "HW, x=2500m" w p ps 1 pt 5 lc rgb "#E69F00", \
-        "system/atm-HargreavesWright-2007/k-HW-Fig6b-4000" \
-            u 1:2 t "HW, x=4000m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
+        "system/atm-HargreavesWright-2007/k-HW-Fig6b-400" \
+            u 1:2 t "HW, x=400m" w p ps 1 pt 5 lc rgb "#E69F00", \
+        "system/atm-HargreavesWright-2007/k-HW-Fig6b-800" \
+            u 1:2 t "HW, x=800m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
         inp0 u $seq:((\$1-$zMin)/zRef) t "OF, x=0m (Patch)" w l lw 2 lc rgb "#009E73", \
         inp1 u $seq:((\$1-$zMin)/zRef) t "OF, x=0m (Cell)" w l lw 2 lc rgb "#F0E440", \
-        inp2 u $seq:((\$1-$zMin)/zRef) t "OF, x=2500m" w l lw 2 lc rgb "#0072B2", \
-        inp3 u $seq:((\$1-$zMin)/zRef) t "OF, x=4000m" w l lw 2 lc rgb "#D55E00", \
-        inp4 u $seq:((\$1-$zMin)/zRef) t "OF, x=5000m (Cell)" w l lw 2 lc rgb "#CC79A7", \
-        inp5 u $seq:((\$1-$zMin)/zRef) t "OF, x=5000m (Patch)" w l lw 2 lc rgb "#440154"
+        inp2 u $seq:((\$1-$zMin)/zRef) t "OF, x=400m" w l lw 2 lc rgb "#0072B2", \
+        inp3 u $seq:((\$1-$zMin)/zRef) t "OF, x=800m" w l lw 2 lc rgb "#D55E00", \
+        inp4 u $seq:((\$1-$zMin)/zRef) t "OF, x=1000m (Cell)" w l lw 2 lc rgb "#CC79A7", \
+        inp5 u $seq:((\$1-$zMin)/zRef) t "OF, x=1000m (Patch)" w l lw 2 lc rgb "#440154"
 PLT_K
 }
 
@@ -185,24 +196,24 @@ plotEpsilon() {
     zRef = 6
     inp0="$timeDir/x_0mCell_$items.xy"
     inp1="$timeDir/x_0mPatch_$items.xy"
-    inp2="$timeDir/x_2500m_$items.xy"
-    inp3="$timeDir/x_4000m_$items.xy"
-    inp4="$timeDir/x_5000mCell_$items.xy"
-    inp5="$timeDir/x_5000mPatch_$items.xy"
+    inp2="$timeDir/x_400m_$items.xy"
+    inp3="$timeDir/x_800m_$items.xy"
+    inp4="$timeDir/x_1000mCell_$items.xy"
+    inp5="$timeDir/x_1000mPatch_$items.xy"
 
     plot \
         "system/atm-HargreavesWright-2007/epsilon-HW-RH-Fig6c" \
             u 1:2 t "RH" w p ps 2 pt 6 lc rgb "#000000", \
         "system/atm-HargreavesWright-2007/epsilon-HW-RH-Fig6c" \
-            u 1:2 t "HW, x=2500m" w p ps 1 pt 5 lc rgb "#E69F00", \
+            u 1:2 t "HW, x=400m" w p ps 1 pt 5 lc rgb "#E69F00", \
         "system/atm-HargreavesWright-2007/epsilon-HW-RH-Fig6c" \
-            u 1:2 t "HW, x=4000m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
+            u 1:2 t "HW, x=800m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
         inp0 u 2:((\$1-$zMin)/zRef) t "OF, x=0m (Patch)" w l lw 2 lc rgb "#009E73", \
         inp1 u 2:((\$1-$zMin)/zRef) t "OF, x=0m (Cell)" w l lw 2 lc rgb "#F0E440", \
-        inp2 u 2:((\$1-$zMin)/zRef) t "OF, x=2500m" w l lw 2 lc rgb "#0072B2", \
-        inp3 u 2:((\$1-$zMin)/zRef) t "OF, x=4000m" w l lw 2 lc rgb "#D55E00", \
-        inp4 u 2:((\$1-$zMin)/zRef) t "OF, x=5000m (Cell)" w l lw 2 lc rgb "#CC79A7", \
-        inp5 u 2:((\$1-$zMin)/zRef) t "OF, x=5000m (Patch)" w l lw 2 lc rgb "#440154"
+        inp2 u 2:((\$1-$zMin)/zRef) t "OF, x=400m" w l lw 2 lc rgb "#0072B2", \
+        inp3 u 2:((\$1-$zMin)/zRef) t "OF, x=800m" w l lw 2 lc rgb "#D55E00", \
+        inp4 u 2:((\$1-$zMin)/zRef) t "OF, x=1000m (Cell)" w l lw 2 lc rgb "#CC79A7", \
+        inp5 u 2:((\$1-$zMin)/zRef) t "OF, x=1000m (Patch)" w l lw 2 lc rgb "#440154"
 PLT_EPSILON
 }
 
@@ -229,18 +240,18 @@ plotOmega() {
     zRef = 6
     inp0="$timeDir/x_0mCell_$items.xy"
     inp1="$timeDir/x_0mPatch_$items.xy"
-    inp2="$timeDir/x_2500m_$items.xy"
-    inp3="$timeDir/x_4000m_$items.xy"
-    inp4="$timeDir/x_5000mCell_$items.xy"
-    inp5="$timeDir/x_5000mPatch_$items.xy"
+    inp2="$timeDir/x_400m_$items.xy"
+    inp3="$timeDir/x_800m_$items.xy"
+    inp4="$timeDir/x_1000mCell_$items.xy"
+    inp5="$timeDir/x_1000mPatch_$items.xy"
 
     plot \
         inp0 u 4:((\$1-$zMin)/zRef) t "OF, x=0m (Patch)" w l lw 2 lc rgb "#009E73", \
         inp1 u 4:((\$1-$zMin)/zRef) t "OF, x=0m (Cell)" w l lw 2 lc rgb "#F0E440", \
-        inp2 u 4:((\$1-$zMin)/zRef) t "OF, x=2500m" w l lw 2 lc rgb "#0072B2", \
-        inp3 u 4:((\$1-$zMin)/zRef) t "OF, x=4000m" w l lw 2 lc rgb "#D55E00", \
-        inp4 u 4:((\$1-$zMin)/zRef) t "OF, x=5000m (Cell)" w l lw 2 lc rgb "#CC79A7", \
-        inp5 u 4:((\$1-$zMin)/zRef) t "OF, x=5000m (Patch)" w l lw 2 lc rgb "#440154"
+        inp2 u 4:((\$1-$zMin)/zRef) t "OF, x=400m" w l lw 2 lc rgb "#0072B2", \
+        inp3 u 4:((\$1-$zMin)/zRef) t "OF, x=800m" w l lw 2 lc rgb "#D55E00", \
+        inp4 u 4:((\$1-$zMin)/zRef) t "OF, x=1000m (Cell)" w l lw 2 lc rgb "#CC79A7", \
+        inp5 u 4:((\$1-$zMin)/zRef) t "OF, x=1000m (Patch)" w l lw 2 lc rgb "#440154"
 PLT_OMEGA
 }
 
@@ -267,24 +278,24 @@ plotMut() {
     zRef = 6
     inp0="$timeDir/x_0mCell_$items.xy"
     inp1="$timeDir/x_0mPatch_$items.xy"
-    inp2="$timeDir/x_2500m_$items.xy"
-    inp3="$timeDir/x_4000m_$items.xy"
-    inp4="$timeDir/x_5000mCell_$items.xy"
-    inp5="$timeDir/x_5000mPatch_$items.xy"
+    inp2="$timeDir/x_400m_$items.xy"
+    inp3="$timeDir/x_800m_$items.xy"
+    inp4="$timeDir/x_1000mCell_$items.xy"
+    inp5="$timeDir/x_1000mPatch_$items.xy"
 
     plot \
         "system/atm-HargreavesWright-2007/mut-RH-Fig6d" \
             u 1:2 t "RH" w p ps 2 pt 6 lc rgb "#000000", \
         "system/atm-HargreavesWright-2007/mut-HW-Fig6d-2500" \
-            u 1:2 t "HW, x=2500m" w p ps 1 pt 5 lc rgb "#E69F00", \
+            u 1:2 t "HW, x=400m" w p ps 1 pt 5 lc rgb "#E69F00", \
         "system/atm-HargreavesWright-2007/mut-HW-Fig6d-4000" \
-            u 1:2 t "HW, x=4000m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
+            u 1:2 t "HW, x=800m" w p ps 0.5 pt 4 lc rgb "#56B4E9", \
         inp0 u $seq:((\$1-$zMin)/zRef) t "OF, x=0m (Patch)" w l lw 2 lc rgb "#009E73", \
         inp1 u $seq:((\$1-$zMin)/zRef) t "OF, x=0m (Cell)" w l lw 2 lc rgb "#F0E440", \
-        inp2 u $seq:((\$1-$zMin)/zRef) t "OF, x=2500m" w l lw 2 lc rgb "#0072B2", \
-        inp3 u $seq:((\$1-$zMin)/zRef) t "OF, x=4000m" w l lw 2 lc rgb "#D55E00", \
-        inp4 u $seq:((\$1-$zMin)/zRef) t "OF, x=5000m (Cell)" w l lw 2 lc rgb "#CC79A7", \
-        inp5 u $seq:((\$1-$zMin)/zRef) t "OF, x=5000m (Patch)" w l lw 2 lc rgb "#440154"
+        inp2 u $seq:((\$1-$zMin)/zRef) t "OF, x=400m" w l lw 2 lc rgb "#0072B2", \
+        inp3 u $seq:((\$1-$zMin)/zRef) t "OF, x=800m" w l lw 2 lc rgb "#D55E00", \
+        inp4 u $seq:((\$1-$zMin)/zRef) t "OF, x=1000m (Cell)" w l lw 2 lc rgb "#CC79A7", \
+        inp5 u $seq:((\$1-$zMin)/zRef) t "OF, x=1000m (Patch)" w l lw 2 lc rgb "#440154"
 PLT_MUT
 }
 

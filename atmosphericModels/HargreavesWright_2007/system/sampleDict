@@ -33,43 +33,43 @@ samples
         {
             type        face;
             axis        z;
-            start       (0 50 0);
-            end         (0 50 500);
+            start       (0 0 0);
+            end         (0 0 500);
         }
         x_0mCell    // inlet-first cell centres
         {
             type        midPoint;
             axis        z;
-            start       (5.0 50 0);
-            end         (5.0 50 500);
+            start       (5.0 0 0);
+            end         (5.0 0 500);
         }
-        x_2500m
+        x_400m
         {
             type        face;
             axis        z;
-            start       (2500 50 0);
-            end         (2500 50 500);
+            start       (400 400 0);
+            end         (400 400 500);
         }
-        x_4000m
+        x_800m
         {
             type        face;
             axis        z;
-            start       (4000 50 0);
-            end         (4000 50 500);
+            start       (800 800 0);
+            end         (800 800 500);
         }
-        x_5000mCell    // outlet patch face centres
+        x_1000mCell    // outlet patch face centres
         {
             type        face;
             axis        z;
-            start       (4995 50 0);
-            end         (4995 50 500);
+            start       (995 1000 0);
+            end         (995 1000 500);
         }
         x_5000mPatch    // outlet-first cell centres
         {
             type        face;
             axis        z;
-            start       (5000 50 0);
-            end         (5000 50 500);
+            start       (1000 1000 0);
+            end         (1000 1000 500);
         }
     );
 }

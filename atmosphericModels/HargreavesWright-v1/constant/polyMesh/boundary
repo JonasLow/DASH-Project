@@ -15,44 +15,39 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-6
+5
 (
-    inletWest
+    inlet
     {
         type            patch;
-        nFaces          5000;
-        startFace       1480000;
-    }
-    outletNorth
-    {
-        type            patch;
-        nFaces          5000;
-        startFace       1485000;
+        nFaces          250;
+        startFace       347250;
     }
     ground
     {
         type            wall;
         inGroups        1(wall);
-        nFaces          10000;
-        startFace       1490000;
+        nFaces          2500;
+        startFace       347500;
     }
     top
     {
         type            patch;
-        nFaces          10000;
-        startFace       1500000;
+        nFaces          2500;
+        startFace       350000;
     }
-    inletSouth
+    sides
+    {
+        type            symmetry;
+        inGroups        1(symmetry);
+        nFaces          50000;
+        startFace       352500;
+    }
+    outlet
     {
         type            patch;
-        nFaces          5000;
-        startFace       1510000;
-    }
-    outletEast
-    {
-        type            patch;
-        nFaces          5000;
-        startFace       1515000;
+        nFaces          250;
+        startFace       402500;
     }
 )
 

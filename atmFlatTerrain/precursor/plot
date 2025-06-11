@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+#------------------------------------------------------------------------------
+# @brief  Plot ground-normal u-z and v-z profiles for atmFlatTerrain
+#------------------------------------------------------------------------------
+cd "${0%/*}" || exit       # cd into this script’s dir
+
+# bring in foamListTimes, runApplication, etc.
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
+
+# Benchmark dataset reference:
+# Knoblitz, J. (2013).
+# CFD Modeling of Non-Neutral Atmospheric Boundary Layer Conditions.
+# DTU Wind Energy PhD, No. 6599(EN), Fig. 4.1.
+
+plotU() {
+    sample=$1
+    echo "Plotting ground-normal streamwise flow (u-z) from sample='$sample'…"
+    out=plots/u-z.png
+    mkdir -p "$(dirname "$out")"
+
+    gnuplot <<-EOF
+      set terminal pngcairo font 'helvetica,20' size 600,1000
+      set output '$out'
+      set title 'Streamwise velocity profile (u vs. z)'
+      set xlabel 'u [m/s]'
+      set ylabel 'z [m]'
+      set xrange [0:25]
+      set yrange [0:100]
+      plot \
+        'system/atm-Knoblitz-2013/urz-Leipzig.dat' using 2:1 \
+          with linespoints title 'Leipzig' pt 6 ps 1.2 lc rgb '#000000', \
+        '$sample/U'                    using 2:1 \
+          with linespoints title 'Simulation' pt 4 ps 1.0 lc rgb '#D953E0'
+    EOF
+}
+
+plotV() {
+    sample=$1
+    echo "Plotting ground-normal spanwise flow (v-z) from sample='$sample'…"
+    out=plots/v-z.png
+    mkdir -p "$(dirname "$out")"
+
+    gnuplot <<-EOF
+      set terminal pngcairo font 'helvetica,20' size 600,1000
+      set output '$out'
+      set title 'Spanwise velocity profile (v vs. z)'
+      set xlabel 'v [m/s]'
+      set ylabel 'z [m]'
+      set xrange [-5:5]
+      set yrange [0:100]
+      plot \
+        'system/atm-Knoblitz-2013/urz-Leipzig.dat' using 3:1 \
+          with linespoints title 'Leipzig' pt 6 ps 1.2 lc rgb '#000000', \
+        '$sample/V'                    using 2:1 \
+          with linespoints title 'Simulation' pt 4 ps 1.0 lc rgb '#D953E0'
+    EOF
+}
+
+# ─── Check prerequisites ──────────────────────────────────────────────────────
+command -v gnuplot >/dev/null 2>&1 || {
+  echo "gnuplot not found—skipping plot." >&2
+  exit 1
+}
+command -v foamListTimes >/dev/null 2>&1 || {
+  echo "foamListTimes unavailable—unable to locate sample times." >&2
+  exit 1
+}
+
+# ─── Find the latest sample time ───────────────────────────────────────────────
+timeDir=$(foamListTimes -case postProcessing/samples -latestTime 2>/dev/null)
+if [ -z "$timeDir" ]; then
+  echo "No entries in postProcessing/samples—nothing to plot." >&2
+  exit 1
+fi
+sample="postProcessing/samples/$timeDir"
+echo "Using sample directory: $sample"
+
+# ─── Prepare outputs ──────────────────────────────────────────────────────────
+mkdir -p plots
+cp -u \
+  "$FOAM_TUTORIALS/resources/dataset/atm-Knoblitz-2013/urz-Leipzig.dat" \
+  system/
+
+# ─── Generate the plots ───────────────────────────────────────────────────────
+plotU "$sample"
+plotV "$sample"
+
+echo "Done – see plots/u-z.png and plots/v-z.png"

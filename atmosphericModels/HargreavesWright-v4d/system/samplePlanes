@@ -1,0 +1,30 @@
+// -*- C++ -*-
+
+samplePlanes
+{
+    type    surfaces;
+    libs    (sampling);
+
+    writeControl    writeTime;
+    surfaceFormat   vtk;
+    fields          (U k epsilon nut);
+
+    surfaces
+    {
+        planes
+        {
+            type        cuttingPlane;
+            planeType   pointAndNormal;
+            pointAndNormalDict
+            {
+                point   (1e-8 0 0);  // slightly inside the domain
+                normal  (1 0 0);
+            }
+
+            offsets ( 100 200 300 400 500 600 700 800 900 );
+        }
+    }
+}
+
+
+// *********************************************************************** //
